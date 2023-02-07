@@ -1,0 +1,518 @@
+/*jshint strict:false */
+
+(function() {
+    'use strict';
+    // this function is strict...
+}());
+
+// Setting up our app requirements
+
+const fs = require('fs');
+const express = require('express');
+const functions = require('./functions.js');
+const csv = require('csv-parser');
+const app = express();
+const Server = require('http').Server;
+const server = new Server(app);
+const path = require('path');
+const port = 5000;
+const WebSocketServer = require("websocket").server;
+var format = require("string-template");
+const { generateCIPA } = require('./functions.js');
+var rows = [];
+var patients = [];
+var clinicians = [];
+var allergies = [];
+var facilities = [];
+var diagnosis = [];
+var agendas = [];
+var measures = [];
+var analysis = [];
+
+// Setting up our port
+
+server.listen(port, () => console.log("Server at 5000"));
+
+// Creamos el servidor de sockets y lo incorporamos al servidor de la aplicación
+const wsServer = new WebSocketServer({
+    httpServer: server,
+    autoAcceptConnections: false
+});
+
+
+// Configuiring simple express routes
+// getDir() function is used here along with package.json.pkg.assets
+
+app.use('/', express.static(getDir() + '/views'));
+
+app.use(express.static(path.join(__dirname, "node_modules/bootstrap/dist/")));
+
+app.get('/', function(req, res) {
+    res.sendFile(getDir() + '/views/index.html');
+});
+
+app.get('/download/patients', function(req, res) {
+    if (fs.existsSync(getDir() + '/views/files/patients.csv')) {
+        res.download(getDir() + '/views/files/patients.csv'); 
+    }
+    else {
+        res.sendFile(getDir() + '/views/index.html');
+    }
+});
+
+app.get('/download/messages', function(req, res) {
+    if (fs.existsSync(getDir() + '/views/files/messages.txt')) {
+        res.download(getDir() + '/views/files/messages.txt'); 
+    }
+    else {
+        res.sendFile(getDir() + '/views/index.html');
+    }
+});
+
+    
+
+// Using a function to set default app path
+function getDir() {
+    if (process.pkg) {
+        return path.resolve(process.execPath + "/..");
+    } else {
+        return path.join(require.main ? require.main.path : process.cwd());
+    }
+}
+
+wsServer.on("request", (request) =>{
+
+    const connection = request.accept(null, request.origin);
+    connection.on("message", (message) => {
+        const dataRequest = JSON.parse(message.utf8Data);
+        if (dataRequest.type === 'patients')
+        {
+            fs.createReadStream('./views/files/personSeed.csv')
+            .pipe(csv())
+            .on('data', (row) => {
+                rows.push(row);
+            })
+            .on('end', () => {
+                console.log('CSV file successfully processed');
+                var patient = '';
+                patient = 'Name,Surname1,Surname2,Gender,TypeStreet,Street,Number,Floor,Door,PostalCode,City,DOB,NHC1,NHC2,CIPA,CellPhone,NSS,MPI,SNS,DNI,Email,Region,Country\r\n';
+                for (var i = 0; i < dataRequest.total; i++) {
+                    const nameGenderIndex = Math.floor(Math.random() * rows.length);
+                    const surname = rows[Math.floor(Math.random() * rows.length)].Surname.toUpperCase();
+                    const name = rows[nameGenderIndex].Name.toUpperCase();
+                    const row = name + ',' +
+                        surname + ',' +
+                        rows[Math.floor(Math.random() * rows.length)].Surname.toUpperCase() + ',' +
+                        rows[nameGenderIndex].Gender.toUpperCase() + ',' +
+                        rows[Math.floor(Math.random() * rows.length)].TypeStreet.toUpperCase() + ',' +
+                        rows[Math.floor(Math.random() * rows.length)].Name.toUpperCase() + ' ' + rows[Math.floor(Math.random() * rows.length)].Surname.toUpperCase() + ',' +
+                        Math.floor(Math.random() * 400) + ',' +
+                        rows[Math.floor(Math.random() * rows.length)].Floor.toUpperCase() + ',' +
+                        rows[Math.floor(Math.random() * rows.length)].Door.toUpperCase() + ',' +
+                        '28' + Math.floor(Math.random()*999).toString().padStart(3, '0') + ',' +
+                        rows[Math.floor(Math.random() * rows.length)].City.toUpperCase() + ',' +
+                        functions.parseDate(new Date(+(new Date()) - Math.floor(Math.random()*2500000000000)), 'dateType', false) + ',' +
+                        functions.generateId(6) + ',' +
+                        functions.generateId(6) + ',' +
+                        '1'+ functions.generateId(9) +','+
+                        '555' + Math.floor(Math.random() * 999999) + ',' +
+                        Math.floor(Math.random() * 99) + '/' + Math.floor(Math.random() * 9999999999) + ',' +
+                        Math.floor(Math.random() * 9999999) + ',' + 
+                        'BBBBBBBBDR'+ Math.floor(Math.random() * 999999) + ',' +
+                        functions.generateDNI(Math.floor(Math.random() * 99999999)).padStart(9,'0') + ',' +
+                        name.replace(/\s/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "") + "." + surname.normalize("NFD").replace(/[\u0300-\u036f]/g, "") + "@" + rows[Math.floor(Math.random() * rows.length)].Email.toUpperCase() + ',' +
+                        rows[Math.floor(Math.random() * rows.length)].Region.toUpperCase() + ',' +
+                        rows[Math.floor(Math.random() * rows.length)].Country.toUpperCase() +'\r\n';
+                    patient += row;
+                    connection.send(sendPatient(row));
+                }
+                fs.writeFileSync('./views/files/patients.csv', patient, (err) => {
+                    // throws an error, you could also catch it here
+                    if (err)
+                        throw err;
+                });
+                connection.send(checkFiles());
+            });
+        }        
+        else if (dataRequest.type === 'clinicians') {
+            fs.createReadStream('./views/files/personSeed.csv')
+                .pipe(csv())
+                .on('data', (row) => {
+                    rows.push(row);
+                })
+                .on('end', () => {
+                    console.log('CSV file successfully processed');
+                    var clinician = '';
+                    clinician = 'Name,Surname1,Surname2,CIAS,User\r\n';
+                    for (var i = 0; i < dataRequest.total; i++) {
+                        clinician = clinician + 
+                            rows[Math.floor(Math.random() * rows.length)].Name.toUpperCase() + ',' +
+                            rows[Math.floor(Math.random() * rows.length)].Surname.toUpperCase() + ',' +
+                            rows[Math.floor(Math.random() * rows.length)].Surname.toUpperCase() + ',' +
+                            '0' + Math.floor(Math.random() * 999999999)+ String.fromCharCode(65+Math.floor(Math.random() * 26)) + ',' +
+                            'user' + Math.floor(Math.random() * 999).toString().padStart( 2, '0') + '\r\n';
+                    }
+                    fs.writeFileSync('./views/files/clinicians.csv', clinician, (err) => {
+                        // throws an error, you could also catch it here
+                        if (err)
+                            throw err;
+                    });
+                    connection.send(checkFiles());
+                });
+        }
+        else if (dataRequest.type === 'check')
+        {
+            connection.send(checkFiles());
+        }
+        else if (dataRequest.type === 'messages')
+        {
+            patients = [];
+            clinicians = [];
+            allergies = [];
+            facilities = [];
+            diagnosis = [];
+            agendas = [];
+            measures = [];
+            analysis = [];
+            fs.createReadStream('./views/files/patients.csv')
+            .pipe(csv())
+            .on('data', (row) => {
+                patients.push(row);
+            })
+            .on('end', () => {
+                fs.createReadStream('./views/files/clinicians.csv')
+                .pipe(csv())
+                .on('data', (row) => {
+                    clinicians.push(row);
+                })
+                .on('end', () => {
+                    fs.createReadStream('./views/files/allergies.csv')
+                    .pipe(csv({
+                        separator: ';'
+                    }))
+                    .on('data', (row) => {
+                        allergies.push(row);
+                    })
+                    .on('end', () => {
+                        fs.createReadStream('./views/files/facilities.csv')
+                        .pipe(csv())
+                        .on('data', (row) => {
+                            facilities.push(row);
+                        })
+                        .on('end', () => {
+                            fs.createReadStream('./views/files/diagnosis.csv')
+                            .pipe(csv({
+                                separator: ';'
+                            }))
+                            .on('data', (row) => {
+                                diagnosis.push(row);
+                            })
+                            .on('end', () => {
+                                fs.createReadStream('./views/files/agendas.csv')
+                                .pipe(csv({
+                                    separator: ';'
+                                }))
+                                .on('data', (row) => {
+                                    agendas.push(row);
+                                })
+                                .on('end', () => {
+                                    fs.createReadStream('./views/files/measures.csv')
+                                    .pipe(csv())
+                                    .on('data', (row) => {
+                                        measures.push(row);
+                                    })
+                                    .on('end', () => {
+                                        fs.createReadStream('./views/files/analysis.csv')
+                                        .pipe(csv())
+                                        .on('data', (row) => {
+                                            analysis.push(row);
+                                        })
+                                        .on('end', () => {
+                                            if (dataRequest.event === 'a28' && fs.existsSync('./views/files/messagesa28.txt'))
+                                            {
+                                                fs.rmSync('./views/files/messagesa28.txt');                                                                        
+                                            }
+                                            else if (dataRequest.event === 's12' && fs.existsSync('./views/files/messagess12.txt'))
+                                            {
+                                                fs.rmSync('./views/files/messagess12.txt');                                                                        
+                                            }
+                                            else if (dataRequest.event === 'r01' && fs.existsSync('./views/files/messagesr01.txt'))
+                                            {
+                                                fs.rmSync('./views/files/messagesr01.txt');                                                                        
+                                            } 
+                                            else if (dataRequest.event === 'a08' && fs.existsSync('./views/files/messagesa08.txt'))
+                                            {
+                                                fs.rmSync('./views/files/messagesa08.txt');                                                                        
+                                            }                                           
+                                            generateMessage(dataRequest.total, dataRequest.event, connection);    
+                                            connection.send(checkFiles()); 
+                                        });  
+                                    }); 
+                                });
+                            }); 
+                        });
+                    });
+                });
+            });
+        return true;
+        }
+    });
+    connection.on("close", (reasonCode, description) => {
+        console.log("El cliente se desconectó");
+    });
+});
+
+function checkFiles() {
+    const filesChecked = {
+        patients: fs.existsSync('./views/files/patients.csv'),
+        clinicians: fs.existsSync('./views/files/clinicians.csv'),
+        messages: fs.existsSync('./views/files/messagesa28.txt') || fs.existsSync('./views/files/messagess12.txt') || fs.existsSync('./views/files/messagesr01.txt')
+    }
+    return JSON.stringify(filesChecked);
+}
+
+function sendMessage(message) {
+    const messageJson = {
+        message: true,
+        messages: false,
+        value: message
+    }
+    return JSON.stringify(messageJson);
+}
+
+function sendPatient(patient) {
+    const messageJson = {
+        patient: true,
+        messages: false,
+        value: patient
+    }
+    return JSON.stringify(messageJson);
+}
+
+function generateMessage(total, event, connection) {
+    
+    var patientIndex = 0;
+    for (var i = 0; i < total; i++){
+        patientIndex = i % patients.length;
+        const dateTime = functions.parseDate(new Date(+(new Date())), 'dateTime', false);
+        const datePoints = functions.parseDate(new Date(+(new Date())), 'date', true);
+        const time = functions.parseDate(new Date(+(new Date())), 'time', false);
+        const patient = patients[patientIndex];
+        const randomPerson1 = patients[Math.floor(Math.random() * patients.length)];
+        const randomPerson2 = patients[Math.floor(Math.random() * patients.length)];
+        const sendingApp = "HIS";
+        const receivingApp = "EMPI";
+        const center1 = facilities[Math.floor(Math.random() * facilities.length)];
+        const center2 = facilities[Math.floor(Math.random() * facilities.length)];
+        const clinician1 = clinicians[Math.floor(Math.random() * clinicians.length)];
+        const clinician2 = clinicians[Math.floor(Math.random() * clinicians.length)];
+        const allergy = allergies[Math.floor(Math.random() * allergies.length)];
+        const diag = diagnosis[Math.floor(Math.random() * diagnosis.length)];
+        const agenda = agendas[Math.floor(Math.random() * agendas.length)];
+        const durationMillis = parseInt(agenda.Duration) * 60 * 1000;
+        const dateInPast = functions.parseDate(new Date(+(new Date()) + Math.floor(Math.random()*1000000000000)), 'dateTime', false);
+        const dateStartAppointment = functions.parseDate(new Date(+(new Date()) + 15000000), 'dateTime', false);
+        const dateEndAppointment = functions.parseDate(new Date(+(new Date()) + (15000000 + durationMillis)), 'dateTime', false);
+        const allergySegment = Math.random() < 0.5 ? 0 : 1;
+        const diagnosisSegment = Math.random() < 0.5 ? 0 : 1;
+        const addSub = Math.random() < 0.5 ? 0 : 1;
+        var message = '';
+        var template = ''
+        if (event === 'a28')
+        {
+            template = fs.readFileSync((allergySegment && diagnosisSegment) ? './views/files/templates/A28/A28.template' : allergySegment ? './views/files/templates/A28/A28_NO_DG1.template' : 
+            diagnosisSegment ? './views/files/templates/A28/A28_NO_AL1.template' : './views/files/templates/A28/A28_NO_AL1_DG1.template' , {encoding:'utf8', flag:'r'})
+
+            message = format(template, {
+                sendingApp: sendingApp,
+                sendingFacility: 'HGUGM',
+                receivingApplication: receivingApp,
+                receivingFacility: center2.code,
+                dateMessage: dateTime,
+                messageId: Math.floor(Math.random() * 999999),
+                patientId: patient.CIPA,
+                assigningAuthority: "SERMAS",
+                patientNHC: patient.NHC1,
+                surname1: patient.Surname1,
+                surname2: patient.Surname2,
+                name: patient.Name,
+                birthDate: patient.DOB.substring(0, 8),
+                sex: patient.Gender,
+                streetAddress: patient.TypeStreet +' '+ patient.Street,
+                restAddress: patient.Number +' '+ patient.Floor +' '+ patient.Door,
+                postalCode: patient.PostalCode,
+                cityAddress: patient.City,
+                region: patient.Region,
+                country: patient.Country,
+                cellPhone: patient.CellPhone,
+                personalEmail: patient.Email,
+                allergyType: allergySegment? allergy.type : '',
+                allergyDescription: allergySegment? allergy.description : '',
+                severityCode: allergySegment? allergy.severityCode : '',
+                severityDescription: allergySegment? allergy.severityName : '',
+                allergyDate: allergySegment? dateInPast : '',
+                diagnosisCode: diagnosisSegment? diag.code : '',
+                diagnosisLiteral: diagnosisSegment? diag.literal : '',
+                diagnosisDate: diagnosisSegment? dateTime.substring(0,8) : '',
+                clinicianSurname: diagnosisSegment? clinician1.Surname1 + ' ' + clinician1.Surname2 : '',
+                clinicianName: diagnosisSegment? clinician1.Name : ''
+            });
+        }
+        else if (event === 's12')
+        {
+            template = fs.readFileSync('./views/files/templates/S12/S12.template' , {encoding:'utf8', flag:'r'});
+            message = format(template, {
+                sendingApp: sendingApp,
+                sendingFacility: 'HULP',
+                receivingApplication: receivingApp,
+                receivingFacility: center2.code,
+                dateMessage: dateTime,
+                placerAppointmentId: Math.floor(Math.random() * 999999),
+                fillerAppointmentId: Math.floor(Math.random() * 999999),
+                agendaCode: agenda.Code,
+                agendaDescription: agenda.Description,
+                agendaExam: agenda.Exam,
+                agendaDuration: agenda.Duration,
+                dateStartAppointment: dateStartAppointment,
+                dateEndAppointment: dateEndAppointment,
+                fillerPersonSurname: randomPerson1.Surname1 + ' ' + randomPerson1.Surname2,
+                fillerPersonName: randomPerson1.Name,
+                enterPersonSurname: randomPerson2.Surname1 + ' ' + randomPerson2.Surname2,
+                enterPersonName: randomPerson2.Name,
+                messageId: Math.floor(Math.random() * 999999),
+                patientId: patient.DNI,
+                assigningAuthority: 'MI',
+                patientNHC: patient.NHC2,
+                surname1: patient.Surname1,
+                surname2: patient.Surname2,
+                name: patient.Name,
+                birthDate: patient.DOB.substring(0, 8),
+                sex: patient.Gender,
+                streetAddress: patient.TypeStreet +' '+ patient.Street,
+                restAddress: patient.Number +' '+ patient.Floor +' '+ patient.Door,
+                postalCode: patient.PostalCode,
+                cityAddress: patient.City,
+                region: patient.Region,
+                country: patient.Country,
+                cellPhone: patient.CellPhone,
+                personalEmail: patient.Email,
+            });
+
+        }
+        else if (event === 'r01')
+        {
+            message = '';
+            // PARA CREAR UNA SERIE DE LECTURAS HACEMOS UN BUCLE PARA REPRESENTAR 10 TOMAS EN 10 DÍAS
+            template = fs.readFileSync('./views/files/templates/R01/R01.template' , {encoding:'utf8', flag:'r'});
+            var templateSegment = fs.readFileSync('./views/files/templates/R01/OBX_segment.template' , {encoding:'utf8', flag:'r'});
+            
+            message += format(template, {
+                sendingApp: sendingApp,
+                sendingFacility: 'HULP',
+                receivingApplication: receivingApp,
+                receivingFacility: center2.code,
+                dateMessage: dateTime,
+                messageId: Math.floor(Math.random() * 999999),
+                patientId: patient.DNI,
+                assigningAuthority: 'MI',
+                patientNHC: patient.NHC2,
+                surname1: patient.Surname1,
+                surname2: patient.Surname2,
+                name: patient.Name,
+                birthDate: patient.DOB.substring(0, 8),
+                sex: patient.Gender,
+                streetAddress: patient.TypeStreet +' '+ patient.Street,
+                restAddress: patient.Number +' '+ patient.Floor +' '+ patient.Door,
+                postalCode: patient.PostalCode,
+                cityAddress: patient.City,
+                region: patient.Region,
+                country: patient.Country,
+                cellPhone: patient.CellPhone,
+                personalEmail: patient.Email,
+                orderingDoctorCias: clinician1.CIAS,
+                orderingDoctorSurname1: clinician1.Surname1,
+                orderingDoctorSurname2: clinician1.Surname2,
+                orderingDoctorName: clinician1.Name,
+                attendingDoctorCias: clinician2.CIAS,
+                attendingDoctorSurname1: clinician2.Surname1,
+                attendingDoctorSurname2: clinician2.Surname2,
+                attendingDoctorName: clinician2.Name,
+                orderRequest: Math.floor(Math.random() * 999999),
+                visitId: Math.floor(Math.random() * 999999),
+                fillerRequest: Math.floor(Math.random() * 999999),
+                sendingFacilityName: center1.Name,
+            });
+            for (var j = 0; j < analysis.length; j++){                    
+                var segment = format(templateSegment, {
+                    id: j+1,
+                    measureId: analysis[j].Code,
+                    measureLabel: analysis[j].Label,
+                    measureValue: Math.floor(parseFloat(analysis[j].Middle) + (Math.random() < 0.5 ? - Math.random() : Math.random()) * parseInt(analysis[j].Random)).toFixed(parseInt(analysis[j].Decimals)),
+                    measureUnits: analysis[j].Units,
+                    measureRange: analysis[j].Range,
+                    dateMeasure: dateTime
+                });
+                message += segment + '\r\n';
+            }            
+        }
+        else if (event === 'a08')
+        {
+            message = '';
+            // PARA CREAR UNA SERIE DE LECTURAS HACEMOS UN BUCLE PARA REPRESENTAR 10 TOMAS EN 10 DÍAS
+            template = fs.readFileSync('./views/files/templates/A08/A08.template' , {encoding:'utf8', flag:'r'});
+            var templateSegment = fs.readFileSync('./views/files/templates/A08/OBX_segment.template' , {encoding:'utf8', flag:'r'});
+            for (var day = 0; day < 10; day++)
+            {
+                var dateMeasure = functions.parseDate(new Date(+(new Date()) - (86400000 * day)), 'dateTime', false);                
+                message += format(template, {
+                    sendingApp: sendingApp,
+                    sendingFacility: 'HULP',
+                    receivingApplication: receivingApp,
+                    receivingFacility: center2.code,
+                    dateMessage: dateMeasure,
+                    messageId: Math.floor(Math.random() * 999999),
+                    patientId: patient.DNI,
+                    assigningAuthority: 'MI',
+                    patientNHC: patient.NHC2,
+                    surname1: patient.Surname1,
+                    surname2: patient.Surname2,
+                    name: patient.Name,
+                    birthDate: patient.DOB.substring(0, 8),
+                    sex: patient.Gender,
+                    streetAddress: patient.TypeStreet +' '+ patient.Street,
+                    restAddress: patient.Number +' '+ patient.Floor +' '+ patient.Door,
+                    postalCode: patient.PostalCode,
+                    cityAddress: patient.City,
+                    region: patient.Region,
+                    country: patient.Country,
+                    cellPhone: patient.CellPhone,
+                    personalEmail: patient.Email,
+                    orderingDoctorCias: clinician1.CIAS,
+                    orderingDoctorSurname1: clinician1.Surname1,
+                    orderingDoctorSurname2: clinician1.Surname2,
+                    orderingDoctorName: clinician1.Name,
+                    orderRequest: Math.floor(Math.random() * 999999),
+                    fillerRequest: Math.floor(Math.random() * 999999),
+                    sendingFacilityName: center1.Name,
+                });
+                message += '\r\n';             
+                for (var k = 0; k < measures.length; k++){  
+                    var segment = format(templateSegment, {
+                        id: k+1,
+                        measureId: measures[k].Code,
+                        measureLabel: measures[k].Label,
+                        measureValue: Math.floor(parseInt(measures[k].Value) + (addSub === 0? - Math.random() : Math.random()) * parseInt(measures[k].Range), 100),
+                        measureUnits: measures[k].Units,
+                        dateMeasure: dateMeasure
+                    });
+                    message += segment + '\r\n';
+                }
+                message += '\r\n\r\n'
+            }   
+        }   
+        connection.send(sendMessage(message));
+        message += '\r\n\r\n';
+        fs.appendFileSync('./views/files/messages'+event+'.txt', message);
+    }
+    return true;
+}

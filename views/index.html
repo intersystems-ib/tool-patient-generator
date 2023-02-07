@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" theme="dark" style="height: 100%;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages Generator</title>
+    <script src="files/js/jquery-3.6.0.min.js"></script>
+    <script src="files/js/index.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    
+</head>
+
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <img src="files/images/InterSystems_IRIS.png">
+            <a class="navbar-brand" href="#">Messages Generator v.1.0</a>
+        </div>
+    </nav>
+    <div class="container" style="height: 30rem;">
+        <div class="row text-center align-items-center justify-content-center">
+            <div class="col-2">
+                <label>Número de mensajes:</label>
+            </div>
+            <div class="col-1">
+                <input class="form-control" type="text" id="numMessages">
+            </div>
+            <div class="col-2">
+                <select id="typeEvent" class="form-control" name="typeEvent">
+                    <option value="a28" selected>ADT^A28</option>
+                    <option value="a08">ADT^A08</option>
+                    <option value="r01">ORU^R01</option>
+                    <option value="s12">SIU^S12</option>
+                </select>
+            </div>
+            <div class="col-4">
+                <button type="button" id="generateMessagesButton" class="btn btn-primary">Generar mensajes</button>
+                <button type="button" class="btn btn-primary" id="downloadMessagesButton" disabled>Descargar mensajes</button>
+            </div>
+        </div>
+        <br/>
+        <div class="row text-center align-items-center justify-content-center">
+            <div class="col-2">
+                <label>Número de pacientes:</label>
+            </div>
+            <div class="col-1">
+                <input type="text" id="numPatients" class="form-control">
+            </div>
+            <div class="col-2"></div>
+            <div class="col-4">
+                <button type="button" id="generatePatientsButton" class="btn btn-primary">Generar pacientes</button>
+                <button type="button" class="btn btn-primary" id="downloadPatientsButton" disabled>Descargar pacientes</button>
+            </div>
+        </div>
+        <br/>
+        <div class="row text-center align-items-center justify-content-center">
+            <div class="col-2">
+                <label for="numClinicians">Número de médicos</label>
+            </div>
+            <div class="col-1">
+                <input type="text" id="numClinicians" class="form-control">
+            </div>
+            <div class="col-2"></div>
+            <div class="col-4">
+                <button type="button" id="generateCliniciansButton" class="btn btn-primary">Generar médicos</button>
+                <button type="button" class="btn btn-primary" id="downloadCliniciansButton" disabled>Descargar médicos</button>
+            </div>
+        </div>
+        <div class="row h-75 mt-3 mb-3">
+            <div class="col h-100">
+                <div class="card w-75 h-100 mx-auto bg-dark">
+                    <div class="card-body h-100 overflow-auto" id="console">                        
+                        <span class="blinking-cursor">_</span>
+                    </div>
+                </div>
+            </div>            
+        </div>        
+    </div>       
+</body>
+
+</html>

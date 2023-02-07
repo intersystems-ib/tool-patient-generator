@@ -1,0 +1,5 @@
+Code,Label,Value,Range,Units
+162986007,Pulso,70,20,bpm
+105723007,Temperatura,36,2,Celsius
+163030003,Presión sanguínea sistólica,120,20,mmHg
+163031004,Presión sanguínea diastólica,80,20,mmHg

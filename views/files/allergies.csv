@@ -1,0 +1,8 @@
+type;description;severityCode;severityName
+DA;Penicilina;SV;Severe
+FA;Cacahuetes;MI;Mild
+FA;Frutos secos;SV;Severe
+FA;Mariscos;MO;Moderate
+MA;Latex;MO;Moderate
+MA;Polen de gramineas;SV;Severe
+MA;Polen de olivo;MI;Mild

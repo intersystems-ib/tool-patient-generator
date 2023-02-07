@@ -1,0 +1,5 @@
+MSH|^~\&|{sendingApp}|{sendingFacility}|{receivingApplication}||{dateMessage}||ORU^R01|{messageId}|P|2.5.1
+PID|||{patientId}^^^{assigningAuthority}^SN~{patientNHC}^^^{sendingFacility}^PI||{surname1} {surname2}^{name}^^^||{birthDate}|{sex}|||{streetAddress} {restAddress}^^{cityAddress}^{region}^{postalCode}^{country}||{cellPhone}^PRN^^{personalEmail}|||||||||||||||||N|
+PV1||O|||||{attendingDoctorCias}^{attendingDoctorSurname1} {attendingDoctorSurname2}^{attendingDoctorName}^^MD^^^^|||||||1|||||{visitId}|||||||||||||||||||||||||{dateMessage}|{dateMessage}
+ORC|1|{orderRequest}|{fillerRequest}||||^^^{dateMessage}||{dateMessage}|||{orderingDoctorCias}^{orderingDoctorSurname1} {orderingDoctorSurname2}^{orderingDoctorName}^^MD^^^^|{sendingFacility}||||||||{sendingFacility}||||||||LAB
+OBR|1|{orderRequest}|{fillerRequest}|LAB^LABORATORY^L|||{dateMeasure}|||||||||{orderingDoctorCias}^{orderingDoctorSurname1} {orderingDoctorSurname2}^{orderingDoctorName}^^MD^^^^|||||||||F

@@ -1,0 +1,22 @@
+Code,Label,Units,Range,Middle,Random,Decimals
+WBC,Conteo de glóbulos blancos,10(9)/L,4.0-10.6,7.3,5,1
+RBC,Conteo de glóbulos rojos,10x12/L,4.5-5.9,5.2,2,1
+HGB,Hemoglobina,g/dL,12.0-16.0,14,4,1
+HCT,Hematocrito,%,36.0-46.0,41,10,1
+MCV,Volumen celular medio,fL,80-100,90,20,0
+MCH,Hemoglobina celular media,pg,26-34,30,10,1
+MCHC,Concentración de hemoglobina celular media,g/dL,31-37,34,10,1
+RDW,Ancho de distribución eritrocitaria,%,11.5-14.5,13,5,1
+PLT,Conteo de plaquetas - Automatizado,10(9)L,140-440,290,250,0
+MPV,Volumen de plaquetas medio,UMx1000,8-11,9.5,4,1
+NE,# Neutrófilos,#,1.8-8.5,5.6,5,2
+LY,# Linfa,#,0.8-3.5,2.7,2.5,2
+MO,# Monocitos,#,0.2-0.9,0.5,0.5,2
+EO,# Eosinófilos,#,0.0-0.6,0.3,0.3,2
+BA,# Basófilos,#,0.0-0.2,0.1,0.1,2
+PERCENTNE,% Neutrófilos,%,40-80,60,30,1
+PERCENTLY,% Linfa,%,15-45,30,25,1
+SEG,Neutrófilos segmentados,%,50-75,62.5,25,1
+LYMPHS,Linfocitos,%,20-44,32,20,1
+MONO,Monocitos,%,2-9,5.5,4,1
+ATYP,Linfocitos atípicos,%,0-100,50,50,0
