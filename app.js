@@ -52,8 +52,8 @@ app.get('/', function(req, res) {
 });
 
 app.get('/download/patients', function(req, res) {
-    if (fs.existsSync(getDir() + '/views/files/patients.csv')) {
-        res.download(getDir() + '/views/files/patients.csv'); 
+    if (fs.existsSync(getDir() + '/views/files/generated/patients.csv')) {
+        res.download(getDir() + '/views/files/generated/patients.csv'); 
     }
     else {
         res.sendFile(getDir() + '/views/index.html');
@@ -61,8 +61,8 @@ app.get('/download/patients', function(req, res) {
 });
 
 app.get('/download/messages', function(req, res) {
-    if (fs.existsSync(getDir() + '/views/files/messages.txt')) {
-        res.download(getDir() + '/views/files/messages.txt'); 
+    if (fs.existsSync(getDir() + '/views/files/generated/messages.txt')) {
+        res.download(getDir() + '/views/files/generated/messages.txt'); 
     }
     else {
         res.sendFile(getDir() + '/views/index.html');
@@ -87,7 +87,7 @@ wsServer.on("request", (request) =>{
         const dataRequest = JSON.parse(message.utf8Data);
         if (dataRequest.type === 'patients')
         {
-            fs.createReadStream('./views/files/personSeed.csv')
+            fs.createReadStream('./views/files/seed/personSeed.csv')
             .pipe(csv())
             .on('data', (row) => {
                 rows.push(row);
@@ -126,7 +126,7 @@ wsServer.on("request", (request) =>{
                     patient += row;
                     connection.send(sendPatient(row));
                 }
-                fs.writeFileSync('./views/files/patients.csv', patient, (err) => {
+                fs.writeFileSync('./views/files/generated/patients.csv', patient, (err) => {
                     // throws an error, you could also catch it here
                     if (err)
                         throw err;
@@ -135,7 +135,7 @@ wsServer.on("request", (request) =>{
             });
         }        
         else if (dataRequest.type === 'clinicians') {
-            fs.createReadStream('./views/files/personSeed.csv')
+            fs.createReadStream('./views/files/seed/personSeed.csv')
                 .pipe(csv())
                 .on('data', (row) => {
                     rows.push(row);
@@ -152,7 +152,7 @@ wsServer.on("request", (request) =>{
                             '0' + Math.floor(Math.random() * 999999999)+ String.fromCharCode(65+Math.floor(Math.random() * 26)) + ',' +
                             'user' + Math.floor(Math.random() * 999).toString().padStart( 2, '0') + '\r\n';
                     }
-                    fs.writeFileSync('./views/files/clinicians.csv', clinician, (err) => {
+                    fs.writeFileSync('./views/files/generated/clinicians.csv', clinician, (err) => {
                         // throws an error, you could also catch it here
                         if (err)
                             throw err;
@@ -174,19 +174,19 @@ wsServer.on("request", (request) =>{
             agendas = [];
             measures = [];
             analysis = [];
-            fs.createReadStream('./views/files/patients.csv')
+            fs.createReadStream('./views/files/generated/patients.csv')
             .pipe(csv())
             .on('data', (row) => {
                 patients.push(row);
             })
             .on('end', () => {
-                fs.createReadStream('./views/files/clinicians.csv')
+                fs.createReadStream('./views/files/generated/clinicians.csv')
                 .pipe(csv())
                 .on('data', (row) => {
                     clinicians.push(row);
                 })
                 .on('end', () => {
-                    fs.createReadStream('./views/files/allergies.csv')
+                    fs.createReadStream('./views/files/seed/allergies.csv')
                     .pipe(csv({
                         separator: ';'
                     }))
@@ -194,13 +194,13 @@ wsServer.on("request", (request) =>{
                         allergies.push(row);
                     })
                     .on('end', () => {
-                        fs.createReadStream('./views/files/facilities.csv')
+                        fs.createReadStream('./views/files/seed/facilities.csv')
                         .pipe(csv())
                         .on('data', (row) => {
                             facilities.push(row);
                         })
                         .on('end', () => {
-                            fs.createReadStream('./views/files/diagnosis.csv')
+                            fs.createReadStream('./views/files/seed/diagnosis.csv')
                             .pipe(csv({
                                 separator: ';'
                             }))
@@ -208,7 +208,7 @@ wsServer.on("request", (request) =>{
                                 diagnosis.push(row);
                             })
                             .on('end', () => {
-                                fs.createReadStream('./views/files/agendas.csv')
+                                fs.createReadStream('./views/files/seed/agendas.csv')
                                 .pipe(csv({
                                     separator: ';'
                                 }))
@@ -216,33 +216,33 @@ wsServer.on("request", (request) =>{
                                     agendas.push(row);
                                 })
                                 .on('end', () => {
-                                    fs.createReadStream('./views/files/measures.csv')
+                                    fs.createReadStream('./views/files/seed/measures.csv')
                                     .pipe(csv())
                                     .on('data', (row) => {
                                         measures.push(row);
                                     })
                                     .on('end', () => {
-                                        fs.createReadStream('./views/files/analysis.csv')
+                                        fs.createReadStream('./views/files/seed/analysis.csv')
                                         .pipe(csv())
                                         .on('data', (row) => {
                                             analysis.push(row);
                                         })
                                         .on('end', () => {
-                                            if (dataRequest.event === 'a28' && fs.existsSync('./views/files/messagesa28.txt'))
+                                            if (dataRequest.event === 'a28' && fs.existsSync('./views/files/generated/messagesa28.txt'))
                                             {
-                                                fs.rmSync('./views/files/messagesa28.txt');                                                                        
+                                                fs.rmSync('./views/files/generated/messagesa28.txt');                                                                        
                                             }
-                                            else if (dataRequest.event === 's12' && fs.existsSync('./views/files/messagess12.txt'))
+                                            else if (dataRequest.event === 's12' && fs.existsSync('./views/files/generated/messagess12.txt'))
                                             {
-                                                fs.rmSync('./views/files/messagess12.txt');                                                                        
+                                                fs.rmSync('./views/files/generated/messagess12.txt');                                                                        
                                             }
-                                            else if (dataRequest.event === 'r01' && fs.existsSync('./views/files/messagesr01.txt'))
+                                            else if (dataRequest.event === 'r01' && fs.existsSync('./views/files/generated/messagesr01.txt'))
                                             {
-                                                fs.rmSync('./views/files/messagesr01.txt');                                                                        
+                                                fs.rmSync('./views/files/generated/messagesr01.txt');                                                                        
                                             } 
-                                            else if (dataRequest.event === 'a08' && fs.existsSync('./views/files/messagesa08.txt'))
+                                            else if (dataRequest.event === 'a08' && fs.existsSync('./views/files/generated/messagesa08.txt'))
                                             {
-                                                fs.rmSync('./views/files/messagesa08.txt');                                                                        
+                                                fs.rmSync('./views/files/generated/messagesa08.txt');                                                                        
                                             }                                           
                                             generateMessage(dataRequest.total, dataRequest.event, connection);    
                                             connection.send(checkFiles()); 
@@ -264,9 +264,9 @@ wsServer.on("request", (request) =>{
 
 function checkFiles() {
     const filesChecked = {
-        patients: fs.existsSync('./views/files/patients.csv'),
-        clinicians: fs.existsSync('./views/files/clinicians.csv'),
-        messages: fs.existsSync('./views/files/messagesa28.txt') || fs.existsSync('./views/files/messagess12.txt') || fs.existsSync('./views/files/messagesr01.txt')
+        patients: fs.existsSync('./views/files/generated/patients.csv'),
+        clinicians: fs.existsSync('./views/files/generated/clinicians.csv'),
+        messages: fs.existsSync('./views/files/generated/messagesa28.txt') || fs.existsSync('./views/files/generated/messagess12.txt') || fs.existsSync('./views/files/generated/messagesr01.txt')
     }
     return JSON.stringify(filesChecked);
 }
@@ -331,6 +331,7 @@ function generateMessage(total, event, connection) {
                 dateMessage: dateTime,
                 messageId: Math.floor(Math.random() * 999999),
                 patientId: patient.CIPA,
+                patientIdIdentifier: 'SN',
                 assigningAuthority: "SERMAS",
                 patientNHC: patient.NHC1,
                 surname1: patient.Surname1,
@@ -381,6 +382,7 @@ function generateMessage(total, event, connection) {
                 enterPersonName: randomPerson2.Name,
                 messageId: Math.floor(Math.random() * 999999),
                 patientId: patient.DNI,
+                patientIdIdentifier: 'NI',
                 assigningAuthority: 'MI',
                 patientNHC: patient.NHC2,
                 surname1: patient.Surname1,
@@ -414,6 +416,7 @@ function generateMessage(total, event, connection) {
                 dateMessage: dateTime,
                 messageId: Math.floor(Math.random() * 999999),
                 patientId: patient.DNI,
+                patientIdIdentifier: 'NI',
                 assigningAuthority: 'MI',
                 patientNHC: patient.NHC2,
                 surname1: patient.Surname1,
@@ -472,6 +475,7 @@ function generateMessage(total, event, connection) {
                     dateMessage: dateMeasure,
                     messageId: Math.floor(Math.random() * 999999),
                     patientId: patient.DNI,
+                    patientIdIdentifier: 'NI',
                     assigningAuthority: 'MI',
                     patientNHC: patient.NHC2,
                     surname1: patient.Surname1,
@@ -512,7 +516,7 @@ function generateMessage(total, event, connection) {
         }   
         connection.send(sendMessage(message));
         message += '\r\n\r\n';
-        fs.appendFileSync('./views/files/messages'+event+'.txt', message);
+        fs.appendFileSync('./views/files/generated/messages'+event+'.txt', message);
     }
     return true;
 }

@@ -1,4 +1,4 @@
 MSH|^~\&|{sendingApp}|{sendingFacility}|{receivingApplication}||{dateMessage}||ADT^A08|{messageId}|P|2.5.1
 EVN|A08|{dateMessage}
-PID|||{patientId}^^^{assigningAuthority}^SN~{patientNHC}^^^{sendingFacility}^PI||{surname1} {surname2}^{name}^^^||{birthDate}|{sex}|||{streetAddress} {restAddress}^^{cityAddress}^{region}^{postalCode}^{country}||{cellPhone}^PRN^^{personalEmail}|||||||||||||||||N|
+PID|||{patientId}^^^{assigningAuthority}^{patientIdIdentifier}~{patientNHC}^^^{sendingFacility}^PI||{surname1} {surname2}^{name}^^^||{birthDate}|{sex}|||{streetAddress} {restAddress}^^{cityAddress}^{region}^{postalCode}^{country}||{cellPhone}^PRN^^{personalEmail}|||||||||||||||||N|
 PV1||N
