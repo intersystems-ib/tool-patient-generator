@@ -246,7 +246,7 @@ wsServer.on("request", (request) =>{
                                             {
                                                 fs.rmSync('./views/files/generated/messagesa08.txt');                                                                        
                                             }                                           
-                                            generateMessage(dataRequest.total, dataRequest.event, connection);    
+                                            generateMessage(dataRequest.total, dataRequest.event, dataRequest.patIdAssigningFacility, dataRequest.patIdTypeIdentifier, dataRequest.assigningAuthority, connection);    
                                             connection.send(checkFiles()); 
                                         });  
                                     }); 
@@ -291,8 +291,7 @@ function sendPatient(patient) {
     return JSON.stringify(messageJson);
 }
 
-function generateMessage(total, event, connection) {
-    
+function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifier, assigningAuthority, connection) {
     var patientIndex = 0;
     for (var i = 0; i < total; i++){
         patientIndex = i % patients.length;
@@ -304,6 +303,9 @@ function generateMessage(total, event, connection) {
         const randomPerson2 = patients[Math.floor(Math.random() * patients.length)];
         const sendingApp = "HIS";
         const receivingApp = "EMPI";
+        const sendingFacility = assigningAuthority;
+        const patIdFacility = patIdAssigningFacility;
+        const typeIdentifier = patIdTypeIdentifier;
         const center1 = facilities[Math.floor(Math.random() * facilities.length)];
         const center2 = facilities[Math.floor(Math.random() * facilities.length)];
         const clinician1 = clinicians[Math.floor(Math.random() * clinicians.length)];
@@ -320,6 +322,13 @@ function generateMessage(total, event, connection) {
         const addSub = Math.random() < 0.5 ? 0 : 1;
         var message = '';
         var template = ''
+
+        var patientID = patient.CIPA
+
+        if (typeIdentifier === 'NI') 
+        {
+            patientID = patient.DNI
+        }
         if (event === 'a28')
         {
             template = fs.readFileSync((allergySegment && diagnosisSegment) ? './views/files/templates/A28/A28.template' : allergySegment ? './views/files/templates/A28/A28_NO_DG1.template' : 
@@ -327,14 +336,14 @@ function generateMessage(total, event, connection) {
 
             message = format(template, {
                 sendingApp: sendingApp,
-                sendingFacility: 'HGUGM',
+                sendingFacility: sendingFacility, // HLUP
                 receivingApplication: receivingApp,
                 receivingFacility: center2.code,
                 dateMessage: dateTime,
                 messageId: Math.floor(Math.random() * 999999),
-                patientId: patient.CIPA,
-                patientIdIdentifier: 'SN',
-                assigningAuthority: "SERMAS",
+                patientId: patientID,
+                patientIdIdentifier: typeIdentifier, //'SN','NI'
+                assigningAuthority: patIdFacility, //"SERMAS",'MI',...
                 patientNHC: patient.NHC1,
                 surname1: patient.Surname1,
                 surname2: patient.Surname2,
@@ -366,7 +375,7 @@ function generateMessage(total, event, connection) {
             template = fs.readFileSync('./views/files/templates/S12/S12.template' , {encoding:'utf8', flag:'r'});
             message = format(template, {
                 sendingApp: sendingApp,
-                sendingFacility: 'HULP',
+                sendingFacility: sendingFacility, //'HULP'
                 receivingApplication: receivingApp,
                 receivingFacility: center2.code,
                 dateMessage: dateTime,
@@ -383,9 +392,9 @@ function generateMessage(total, event, connection) {
                 enterPersonSurname: randomPerson2.Surname1 + ' ' + randomPerson2.Surname2,
                 enterPersonName: randomPerson2.Name,
                 messageId: Math.floor(Math.random() * 999999),
-                patientId: patient.DNI,
-                patientIdIdentifier: 'NI',
-                assigningAuthority: 'MI',
+                patientId: patientID,
+                patientIdIdentifier: typeIdentifier, //'NI'
+                assigningAuthority: patIdFacility, // 'MI'
                 patientNHC: patient.NHC2,
                 surname1: patient.Surname1,
                 surname2: patient.Surname2,
@@ -412,14 +421,14 @@ function generateMessage(total, event, connection) {
             
             message += format(template, {
                 sendingApp: sendingApp,
-                sendingFacility: 'HULP',
+                sendingFacility: sendingFacility, //'HULP'
                 receivingApplication: receivingApp,
                 receivingFacility: center2.code,
                 dateMessage: dateTime,
                 messageId: Math.floor(Math.random() * 999999),
-                patientId: patient.DNI,
-                patientIdIdentifier: 'NI',
-                assigningAuthority: 'MI',
+                patientId: patientID,
+                patientIdIdentifier: typeIdentifier, //'NI'
+                assigningAuthority: patIdFacility, // 'MI'
                 patientNHC: patient.NHC2,
                 surname1: patient.Surname1,
                 surname2: patient.Surname2,
@@ -471,14 +480,14 @@ function generateMessage(total, event, connection) {
                 var dateMeasure = functions.parseDate(new Date(+(new Date()) - (86400000 * day)), 'dateTime', false);                
                 message += format(template, {
                     sendingApp: sendingApp,
-                    sendingFacility: 'HULP',
+                    sendingFacility: sendingFacility, //'HULP'
                     receivingApplication: receivingApp,
                     receivingFacility: center2.code,
                     dateMessage: dateMeasure,
                     messageId: Math.floor(Math.random() * 999999),
-                    patientId: patient.CIPA,
-                    patientIdIdentifier: 'SN',
-                    assigningAuthority: 'SERMAS',
+                    patientId: patientID,
+                    patientIdIdentifier: typeIdentifier, //'NI'
+                    assigningAuthority: patIdFacility, // 'MI'
                     patientNHC: patient.NHC1,
                     surname1: patient.Surname1,
                     surname2: patient.Surname2,

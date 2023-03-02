@@ -41,6 +41,36 @@
                 <button type="button" id="generateMessagesButton" class="btn btn-primary">Generar mensajes</button>
                 <button type="button" class="btn btn-primary" id="downloadMessagesButton" disabled>Descargar mensajes</button>
             </div>
+            </div>
+        <div class="row text-center align-items-center justify-content-center">
+            <div class="col-2">
+                <label>Assigning Authority</label>
+                <select id="assigningAuthority" class="form-control" name="assigningAuthority" label="hola">
+                    <option value="HULP" selected>Hospital Univ La Paz</option>
+                    <option value="CHGM">Gregorio Marañón</option>
+                    <option value="H12OCT">Hospital 12 de Octubre</option>
+                    <option value="HCSC">H. Clínico San Carlos</option>
+                    <option value="OTHER">Otro Centro</option>
+                </select>
+            </div>
+            <div class="col-2">
+                <label>ID Type Identifier</label>
+                <select id="patIdTypeIdentifier" class="form-control" name="patIdTypeIdentifier">
+                    <option value="SN" selected>Social Number (SN)</option>
+                    <option value="NI">National ID - NIF (NI)</option>
+                </select>
+            </div>
+            <div class="col-2">
+                <label>ID Assigning Facility</label>
+                <select id="patIdAssigningFacility" class="form-control" name="patIdAssigningFacility">
+                    <option value="SERMAS" selected>Servicio Madrileño (SERMAS)</option>
+                    <option value="MI">Ministerio del Interios (MI)</option>
+                    <option value="SESPA">Servicio Asturiano (SESPA)</option>
+                    <option value="SAS">Servicio Andaluz (SAS)</option>
+                    <option value="SCS">Servicio Canario (SCS)</option>
+                    <option value="CATS">Servicio Catalán (CATS)</option>
+                </select>
+            </div>
         </div>
         <br/>
         <div class="row text-center align-items-center justify-content-center">

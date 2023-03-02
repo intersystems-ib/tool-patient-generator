@@ -11,6 +11,9 @@ function downloadMessages()
 function sendGenerationRequest(type){
     var total = 1;
     var event = '';
+    var patIdAssigningFacility = '';
+    var patIdTypeIdentifier = '';
+    var assigningAuthority = '';
     if (type === 'patients')
     {
         total = $('#numPatients').val();        
@@ -23,12 +26,18 @@ function sendGenerationRequest(type){
     {
         total = $('#numMessages').val();
         event = $('#typeEvent').val();
+        assigningAuthority = $('#assigningAuthority').val();
+        patIdAssigningFacility = $('#patIdAssigningFacility').val();
+        patIdTypeIdentifier = $('#patIdTypeIdentifier').val();
     }
 
     const infoRequest = {
         type: type,
         total: total,
-        event: event
+        event: event,
+        patIdAssigningFacility: patIdAssigningFacility,
+        patIdTypeIdentifier: patIdTypeIdentifier,
+        assigningAuthority: assigningAuthority
     };
 
     websocket.send(JSON.stringify(infoRequest));
