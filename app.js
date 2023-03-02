@@ -95,7 +95,7 @@ wsServer.on("request", (request) =>{
             .on('end', () => {
                 console.log('CSV file successfully processed');
                 var patient = '';
-                patient = 'Name,Surname1,Surname2,Gender,TypeStreet,Street,Number,Floor,Door,PostalCode,City,DOB,NHC1,NHC2,CIPA,CellPhone,NSS,MPI,SNS,DNI,Email,Region,Country\r\n';
+                patient = 'Name,Surname1,Surname2,Gender,TypeStreet,Street,Number,Floor,Door,PostalCode,City,DOB,NHC1,NHC2,NHC3,NHC4,CIPA,CellPhone,NSS,MPI,SNS,DNI,Email,Region,Country\r\n';
                 for (var i = 0; i < dataRequest.total; i++) {
                     const nameGenderIndex = Math.floor(Math.random() * rows.length);
                     const surname = rows[Math.floor(Math.random() * rows.length)].Surname.toUpperCase();
@@ -104,25 +104,27 @@ wsServer.on("request", (request) =>{
                         surname + ',' +
                         rows[Math.floor(Math.random() * rows.length)].Surname.toUpperCase() + ',' +
                         rows[nameGenderIndex].Gender.toUpperCase() + ',' +
-                        rows[Math.floor(Math.random() * rows.length)].TypeStreet.toUpperCase() + ',' +
-                        rows[Math.floor(Math.random() * rows.length)].Name.toUpperCase() + ' ' + rows[Math.floor(Math.random() * rows.length)].Surname.toUpperCase() + ',' +
+                        rows[Math.floor(Math.random() * rows.length)].TypeStreet.toUpperCase() + ',' + 
+                        rows[Math.floor(Math.random() * rows.length)].Name.toUpperCase() + ' ' + rows[Math.floor(Math.random() * rows.length)].Surname.toUpperCase() + ',' + //STREET
                         Math.floor(Math.random() * 400) + ',' +
-                        rows[Math.floor(Math.random() * rows.length)].Floor.toUpperCase() + ',' +
-                        rows[Math.floor(Math.random() * rows.length)].Door.toUpperCase() + ',' +
-                        '28' + Math.floor(Math.random()*999).toString().padStart(3, '0') + ',' +
-                        rows[Math.floor(Math.random() * rows.length)].City.toUpperCase() + ',' +
-                        functions.parseDate(new Date(+(new Date()) - Math.floor(Math.random()*2500000000000)), 'dateType', false) + ',' +
-                        functions.generateId(6) + ',' +
-                        functions.generateId(6) + ',' +
-                        '1'+ functions.generateId(9) +','+
-                        '555' + Math.floor(Math.random() * 999999) + ',' +
-                        Math.floor(Math.random() * 99) + '/' + Math.floor(Math.random() * 9999999999) + ',' +
-                        Math.floor(Math.random() * 9999999) + ',' + 
-                        'BBBBBBBBDR'+ Math.floor(Math.random() * 999999) + ',' +
-                        functions.generateDNI(Math.floor(Math.random() * 99999999)).padStart(9,'0') + ',' +
-                        name.replace(/\s/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "") + "." + surname.normalize("NFD").replace(/[\u0300-\u036f]/g, "") + "@" + rows[Math.floor(Math.random() * rows.length)].Email.toUpperCase() + ',' +
-                        rows[Math.floor(Math.random() * rows.length)].Region.toUpperCase() + ',' +
-                        rows[Math.floor(Math.random() * rows.length)].Country.toUpperCase() +'\r\n';
+                        rows[Math.floor(Math.random() * rows.length)].Floor.toUpperCase() + ',' + 
+                        rows[Math.floor(Math.random() * rows.length)].Door.toUpperCase() + ',' + //DOOR
+                        '28' + Math.floor(Math.random()*999).toString().padStart(3, '0') + ',' + //POSTALCODE
+                        rows[Math.floor(Math.random() * rows.length)].City.toUpperCase() + ',' + //CITY
+                        functions.parseDate(new Date(+(new Date()) - Math.floor(Math.random()*2500000000000)), 'dateType', false) + ',' + //DOB
+                        functions.generateId(6) + ',' +  //NHC1
+                        functions.generateId(6) + ',' +  //NHC2
+                        functions.generateId(6) + ',' +  //NHC3
+                        functions.generateId(6) + ',' +  //NHC4
+                        '1'+ functions.generateId(9) +','+ //CIPA
+                        '555' + Math.floor(Math.random() * 999999) + ',' + //CellPhone
+                        Math.floor(Math.random() * 99) + '/' + Math.floor(Math.random() * 9999999999) + ',' + // NSS
+                        Math.floor(Math.random() * 9999999) + ',' +  // MPI
+                        'BBBBBBBBDR'+ Math.floor(Math.random() * 999999) + ',' + //SNS
+                        functions.generateDNI(Math.floor(Math.random() * 99999999)).padStart(9,'0') + ',' + //NIF
+                        name.replace(/\s/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "") + "." + surname.normalize("NFD").replace(/[\u0300-\u036f]/g, "") + "@" + rows[Math.floor(Math.random() * rows.length)].Email.toUpperCase() + ',' + //EMAIL
+                        rows[Math.floor(Math.random() * rows.length)].Region.toUpperCase() + ',' + //REGION
+                        rows[Math.floor(Math.random() * rows.length)].Country.toUpperCase() +'\r\n'; //COUNTRY
                     patient += row;
                     connection.send(sendPatient(row));
                 }
@@ -474,10 +476,10 @@ function generateMessage(total, event, connection) {
                     receivingFacility: center2.code,
                     dateMessage: dateMeasure,
                     messageId: Math.floor(Math.random() * 999999),
-                    patientId: patient.DNI,
-                    patientIdIdentifier: 'NI',
-                    assigningAuthority: 'MI',
-                    patientNHC: patient.NHC2,
+                    patientId: patient.CIPA,
+                    patientIdIdentifier: 'SN',
+                    assigningAuthority: 'SERMAS',
+                    patientNHC: patient.NHC1,
                     surname1: patient.Surname1,
                     surname2: patient.Surname2,
                     name: patient.Name,
