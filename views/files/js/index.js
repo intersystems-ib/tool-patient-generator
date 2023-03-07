@@ -14,6 +14,8 @@ function sendGenerationRequest(type){
     var patIdAssigningFacility = '';
     var patIdTypeIdentifier = '';
     var assigningAuthority = '';
+    var patNHC = '';
+
     if (type === 'patients')
     {
         total = $('#numPatients').val();        
@@ -29,6 +31,7 @@ function sendGenerationRequest(type){
         assigningAuthority = $('#assigningAuthority').val();
         patIdAssigningFacility = $('#patIdAssigningFacility').val();
         patIdTypeIdentifier = $('#patIdTypeIdentifier').val();
+        patNHC = $('#patNHC').val();
     }
 
     const infoRequest = {
@@ -37,7 +40,8 @@ function sendGenerationRequest(type){
         event: event,
         patIdAssigningFacility: patIdAssigningFacility,
         patIdTypeIdentifier: patIdTypeIdentifier,
-        assigningAuthority: assigningAuthority
+        assigningAuthority: assigningAuthority,
+        patNHC: patNHC
     };
 
     websocket.send(JSON.stringify(infoRequest));

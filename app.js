@@ -95,7 +95,7 @@ wsServer.on("request", (request) =>{
             .on('end', () => {
                 console.log('CSV file successfully processed');
                 var patient = '';
-                patient = 'Name,Surname1,Surname2,Gender,TypeStreet,Street,Number,Floor,Door,PostalCode,City,DOB,NHC1,NHC2,NHC3,NHC4,CIPA,CellPhone,NSS,MPI,SNS,DNI,Email,Region,Country\r\n';
+                patient = 'Name,Surname1,Surname2,Gender,TypeStreet,Street,Number,Floor,Door,PostalCode,City,DOB,NHC1,NHC2,NHC3,NHC4,NHC5,NHC6,NHC7,NHC8,CIPA,CellPhone,NSS,MPI,SNS,DNI,Email,Region,Country\r\n';
                 for (var i = 0; i < dataRequest.total; i++) {
                     const nameGenderIndex = Math.floor(Math.random() * rows.length);
                     const surname = rows[Math.floor(Math.random() * rows.length)].Surname.toUpperCase();
@@ -116,6 +116,10 @@ wsServer.on("request", (request) =>{
                         functions.generateId(6) + ',' +  //NHC2
                         functions.generateId(6) + ',' +  //NHC3
                         functions.generateId(6) + ',' +  //NHC4
+                        functions.generateId(6) + ',' +  //NHC5
+                        functions.generateId(6) + ',' +  //NHC6
+                        functions.generateId(6) + ',' +  //NHC7
+                        functions.generateId(6) + ',' +  //NHC8                    
                         '1'+ functions.generateId(9) +','+ //CIPA
                         '555' + Math.floor(Math.random() * 999999) + ',' + //CellPhone
                         Math.floor(Math.random() * 99) + '/' + Math.floor(Math.random() * 9999999999) + ',' + // NSS
@@ -246,7 +250,7 @@ wsServer.on("request", (request) =>{
                                             {
                                                 fs.rmSync('./views/files/generated/messagesa08.txt');                                                                        
                                             }                                           
-                                            generateMessage(dataRequest.total, dataRequest.event, dataRequest.patIdAssigningFacility, dataRequest.patIdTypeIdentifier, dataRequest.assigningAuthority, connection);    
+                                            generateMessage(dataRequest.total, dataRequest.event, dataRequest.patIdAssigningFacility, dataRequest.patIdTypeIdentifier, dataRequest.assigningAuthority, dataRequest.patNHC, connection);    
                                             connection.send(checkFiles()); 
                                         });  
                                     }); 
@@ -291,7 +295,7 @@ function sendPatient(patient) {
     return JSON.stringify(messageJson);
 }
 
-function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifier, assigningAuthority, connection) {
+function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifier, assigningAuthority, patNHC, connection) {
     var patientIndex = 0;
     for (var i = 0; i < total; i++){
         patientIndex = i % patients.length;
@@ -320,6 +324,30 @@ function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifie
         const allergySegment = Math.random() < 0.5 ? 0 : 1;
         const diagnosisSegment = Math.random() < 0.5 ? 0 : 1;
         const addSub = Math.random() < 0.5 ? 0 : 1;
+        
+        var NHC = patient.NHC1
+        if (patNHC === '2') {
+            NHC = patient.NHC2
+        }
+        else if (patNHC === '3') {
+            NHC = patient.NHC3
+        }
+        else if (patNHC === '4') {
+            NHC = patient.NHC4
+        }
+        else if (patNHC === '5') {
+            NHC = patient.NHC5
+        }
+        else if (patNHC === '6') {
+            NHC = patient.NHC6
+        }
+        else if (patNHC === '7') {
+            NHC = patient.NHC7
+        }
+        else if (patNHC === '8') {
+            NHC = patient.NHC8
+        }
+
         var message = '';
         var template = ''
 
@@ -342,9 +370,9 @@ function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifie
                 dateMessage: dateTime,
                 messageId: Math.floor(Math.random() * 999999),
                 patientId: patientID,
-                patientIdIdentifier: typeIdentifier, //'SN','NI'
-                assigningAuthority: patIdFacility, //"SERMAS",'MI',...
-                patientNHC: patient.NHC1,
+                patientIdIdentifier: typeIdentifier, //'SN','NI', 'SSN'
+                assigningAuthority: patIdFacility, //"SERMAS",'MI','SEGSOC',...
+                patientNHC: NHC,
                 surname1: patient.Surname1,
                 surname2: patient.Surname2,
                 name: patient.Name,
@@ -395,7 +423,7 @@ function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifie
                 patientId: patientID,
                 patientIdIdentifier: typeIdentifier, //'NI'
                 assigningAuthority: patIdFacility, // 'MI'
-                patientNHC: patient.NHC2,
+                patientNHC: NHC,
                 surname1: patient.Surname1,
                 surname2: patient.Surname2,
                 name: patient.Name,
@@ -429,7 +457,7 @@ function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifie
                 patientId: patientID,
                 patientIdIdentifier: typeIdentifier, //'NI'
                 assigningAuthority: patIdFacility, // 'MI'
-                patientNHC: patient.NHC2,
+                patientNHC: NHC,
                 surname1: patient.Surname1,
                 surname2: patient.Surname2,
                 name: patient.Name,
@@ -488,7 +516,7 @@ function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifie
                     patientId: patientID,
                     patientIdIdentifier: typeIdentifier, //'NI'
                     assigningAuthority: patIdFacility, // 'MI'
-                    patientNHC: patient.NHC1,
+                    patientNHC: NHC,
                     surname1: patient.Surname1,
                     surname2: patient.Surname2,
                     name: patient.Name,
