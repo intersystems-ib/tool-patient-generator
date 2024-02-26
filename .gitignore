@@ -1,4 +1,4 @@
-views/files/generated/*.*
+views/files/generated/*.csv
 
 # Logs
 logs
