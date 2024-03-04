@@ -5,7 +5,12 @@ function downloadPatients()
 
 function downloadMessages()
 {
-    window.location = 'http://localhost:5000/download/messages'
+    window.location = 'http://localhost:5000/download/messages?type='+$('#typeEvent').val();
+}
+
+function downloadClinicians()
+{
+    window.location = 'http://localhost:5000/download/clinicians'
 }
 
 function sendGenerationRequest(type){
@@ -160,9 +165,18 @@ $(document).ready(function() {
         $('#console').empty();
     });
     
-    $('#eventDownloadButton').click(function()
+    $('#downloadMessagesButton').click(function()
     {
         downloadMessages();
+    });
+
+    $('#downloadPatientsButton').click(function()
+    {
+        downloadPatients();
+    });
+    $('#downloadCliniciansButton').click(function()
+    {
+        downloadClinicians();
     });
 });
 

@@ -1,4 +1,5 @@
 views/files/generated/*.csv
+views/files/generated/*.txt
 
 # Logs
 logs

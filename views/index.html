@@ -15,136 +15,149 @@
 </head>
 
 <body class="bg-light">
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar bg-body-tertiary">
         <div class="container-fluid">
-            <img src="files/images/InterSystems_IRIS.png">
-            <a class="navbar-brand" href="#">Messages Generator v.1.0</a>
+          <span class="navbar-brand mb-0 h1">Messages Generator v.1.0</span>
         </div>
     </nav>
+    <br/>
     <div class="container" style="height: 30rem;">
-        <div class="container p-2" style="border-style: outset;">
-            <div class="row text-center align-items-center justify-content-center">
-                <div class="col-2">
-                    <label>Número de mensajes:</label>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Patients</h5>
+                <div class="row text-center align-items-center justify-content-center">
+                    <div class="col-2">
+                        <label>Total patients:</label>
+                    </div>
+                    <div class="col-1">
+                        <input type="text" id="numPatients" class="form-control">
+                    </div>
+                    <div class="col-6"></div>                
                 </div>
-                <div class="col-2">
-                    <input class="form-control" type="text" id="numMessages">
-                </div>
-                <div class="col-2">
-                    <label>Tipo de mensajes:</label>
-                </div>
-                <div class="col-2">
-                    <select id="typeEvent" class="form-control" name="typeEvent">
-                        <option value="a28" selected>ADT^A28</option>
-                        <option value="a08">ADT^A08</option>
-                        <option value="r01">ORU^R01</option>
-                        <option value="s12">SIU^S12</option>
-                    </select>
-                </div>
-                <div class="col-1"></div>
-            </div>
-            <br/>
-            <div class="row text-center align-items-center justify-content-center">
-                <div class="col-2">
-                    <label>Assigning Authority</label>
-                </div>
-                <div class="col-2">
-                    <select id="assigningAuthority" class="form-control" name="assigningAuthority" label="hola">
-                        <option value="HULP" selected>Hospital Univ La Paz</option>
-                        <option value="CHGM">Gregorio Marañón</option>
-                        <option value="H12OCT">Hospital 12 de Octubre</option>
-                        <option value="HCSC">H. Clínico San Carlos</option>
-                        <option value="OTHER">Otro Centro</option>
-                    </select>
-                </div>
-                <div class="col-2">                
-                    <label>ID Type Identifier</label>
-                </div>
-                <div class="col-2">
-                    <select id="patIdTypeIdentifier" class="form-control" name="patIdTypeIdentifier">
-                        <option value="SSN" selected>Social Security Number (SSN)</option>
-                        <option value="SN" selected>Subscriber Number (SN)</option>
-                        <option value="NI">National ID - NIF (NI)</option>
-                    </select>
-                </div> 
-                <div class="col-1"></div>
-            </div>    
-            <br/>    
-            <div class="row text-center align-items-center justify-content-center">                        
-                <div class="col-2">
-                    <label>ID Assigning Facility</label>
-                </div>
-                <div class="col-2">
-                    <select id="patIdAssigningFacility" class="form-control" name="patIdAssigningFacility">
-                        <option value="SERMAS" selected>Servicio Madrileño (SERMAS)</option>
-                        <option value="SEGSOC">Seguridad Social (SEGSOC)</option>
-                        <option value="MI">Ministerio del Interior (MI)</option>
-                        <option value="SESPA">Servicio Asturiano (SESPA)</option>
-                        <option value="SAS">Servicio Andaluz (SAS)</option>
-                        <option value="SCS">Servicio Canario (SCS)</option>
-                        <option value="CATS">Servicio Catalán (CATS)</option>
-                    </select>
-                </div>
-                <div class="col-2">
-                    <label>NHC</label>
-                </div>
-                <div class="col-2">
-                    <select id="patNHC" class="form-control" name="patNHC">
-                        <option value="1" selected>NHC Random 1</option>
-                        <option value="2">NHC Random 2</option>
-                        <option value="3">NHC Random 3</option>
-                        <option value="4">NHC Random 4</option>
-                        <option value="5">NHC Random 5</option>
-                        <option value="6">NHC Random 6</option>
-                        <option value="7">NHC Random 7</option>
-                        <option value="8">NHC Random 8</option>
-                    </select>
-                </div>
-                <div class="col-1"></div> 
-            </div>
-            <br/>
-            <div class="row text-center align-items-center justify-content-center">
-                <div class="col-9">
-                    <button type="button" id="generateMessagesButton" class="btn btn-primary">Generar mensajes</button>
-                    <button type="button" class="btn btn-primary" id="downloadMessagesButton" disabled>Descargar mensajes</button>
+                <br/>
+                <div class="row text-center align-items-center justify-content-center">
+                    <div class="col-9">
+                        <button type="button" id="generatePatientsButton" class="btn btn-primary">Generate patients</button>
+                        <button type="button" class="btn btn-primary" id="downloadPatientsButton" disabled>Download patients</button>
+                    </div>
                 </div>
             </div>
-        </div>
-        
+        </div>            
         <br/>
-        <div class="container p-2" style="border-style: outset;">
-            <div class="row text-center align-items-center justify-content-center">
-                <div class="col-2">
-                    <label>Número de pacientes:</label>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Clinicians</h5>
+                <div class="row text-center align-items-center justify-content-center">
+                    <div class="col-2">
+                        <label for="numClinicians">Total clinicians</label>
+                    </div>
+                    <div class="col-1">
+                        <input type="text" id="numClinicians" class="form-control">
+                    </div>
+                    <div class="col-6"></div>
                 </div>
-                <div class="col-1">
-                    <input type="text" id="numPatients" class="form-control">
-                </div>
-                <div class="col-2"></div>                
-                <div class="col-4">
-                    <button type="button" id="generatePatientsButton" class="btn btn-primary">Generar pacientes</button>
-                    <button type="button" class="btn btn-primary" id="downloadPatientsButton" disabled>Descargar pacientes</button>
+                <br/>
+                <div class="row text-center align-items-center justify-content-center">
+                    <div class="col-9">
+                        <button type="button" id="generateCliniciansButton" class="btn btn-primary">Generate clinicians</button>
+                        <button type="button" class="btn btn-primary" id="downloadCliniciansButton" disabled>Download clinicians</button>
+                    </div>
                 </div>
             </div>
         </div>
-        
         <br/>
-        <div class="container p-2" style="border-style: outset;">
-            <div class="row text-center align-items-center justify-content-center">
-                <div class="col-2">
-                    <label for="numClinicians">Número de médicos</label>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Messages</h5>
+                <div class="row text-center align-items-center justify-content-center">
+                    <div class="col-2">
+                        <label>Total messages:</label>
+                    </div>
+                    <div class="col-2">
+                        <input class="form-control" type="text" id="numMessages">
+                    </div>
+                    <div class="col-2">
+                        <label>Messages type:</label>
+                    </div>
+                    <div class="col-2">
+                        <select id="typeEvent" class="form-control" name="typeEvent">
+                            <option value="a28" selected>ADT^A28</option>
+                            <option value="a08">ADT^A08</option>
+                            <option value="r01">ORU^R01</option>
+                            <option value="s12">SIU^S12</option>
+                        </select>
+                    </div>
+                    <div class="col-1"></div>
                 </div>
-                <div class="col-1">
-                    <input type="text" id="numClinicians" class="form-control">
+                <br/>
+                <div class="row text-center align-items-center justify-content-center">
+                    <div class="col-2">
+                        <label>Assigning Authority</label>
+                    </div>
+                    <div class="col-2">
+                        <select id="assigningAuthority" class="form-control" name="assigningAuthority" label="hola">
+                            <option value="HULP" selected>Hospital Univ La Paz</option>
+                            <option value="CHGM">Gregorio Marañón</option>
+                            <option value="H12OCT">Hospital 12 de Octubre</option>
+                            <option value="HCSC">H. Clínico San Carlos</option>
+                            <option value="OTHER">Otro Centro</option>
+                        </select>
+                    </div>
+                    <div class="col-2">                
+                        <label>ID Type Identifier</label>
+                    </div>
+                    <div class="col-2">
+                        <select id="patIdTypeIdentifier" class="form-control" name="patIdTypeIdentifier">
+                            <option value="SSN" selected>Social Security Number (SSN)</option>
+                            <option value="SN" selected>Subscriber Number (SN)</option>
+                            <option value="NI">National ID - NIF (NI)</option>
+                        </select>
+                    </div> 
+                    <div class="col-1"></div>
+                </div>    
+                <br/>    
+                <div class="row text-center align-items-center justify-content-center">                        
+                    <div class="col-2">
+                        <label>ID Assigning Facility</label>
+                    </div>
+                    <div class="col-2">
+                        <select id="patIdAssigningFacility" class="form-control" name="patIdAssigningFacility">
+                            <option value="SERMAS" selected>Servicio Madrileño (SERMAS)</option>
+                            <option value="SEGSOC">Seguridad Social (SEGSOC)</option>
+                            <option value="MI">Ministerio del Interior (MI)</option>
+                            <option value="SESPA">Servicio Asturiano (SESPA)</option>
+                            <option value="SAS">Servicio Andaluz (SAS)</option>
+                            <option value="SCS">Servicio Canario (SCS)</option>
+                            <option value="CATS">Servicio Catalán (CATS)</option>
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <label>MRN</label>
+                    </div>
+                    <div class="col-2">
+                        <select id="patNHC" class="form-control" name="patNHC">
+                            <option value="1" selected>MRN Random 1</option>
+                            <option value="2">MRN Random 2</option>
+                            <option value="3">MRN Random 3</option>
+                            <option value="4">MRN Random 4</option>
+                            <option value="5">MRN Random 5</option>
+                            <option value="6">MRN Random 6</option>
+                            <option value="7">MRN Random 7</option>
+                            <option value="8">MRN Random 8</option>
+                        </select>
+                    </div>
+                    <div class="col-1"></div> 
                 </div>
-                <div class="col-2"></div>
-                <div class="col-4">
-                    <button type="button" id="generateCliniciansButton" class="btn btn-primary">Generar médicos</button>
-                    <button type="button" class="btn btn-primary" id="downloadCliniciansButton" disabled>Descargar médicos</button>
+                <br/>
+                <div class="row text-center align-items-center justify-content-center">
+                    <div class="col-9">
+                        <button type="button" id="generateMessagesButton" class="btn btn-primary">Generate messages</button>
+                        <button type="button" class="btn btn-primary" id="downloadMessagesButton" disabled>Download messages</button>
+                    </div>
                 </div>
             </div>
+        </div>        
         
-        </div>
         <div class="row h-75 mt-3 mb-3">
             <div class="col h-100">
                 <div class="card w-75 h-100 mx-auto bg-dark">
