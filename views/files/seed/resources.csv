@@ -1,0 +1,12 @@
+Code;Exam;Description;Service;ServiceDescription;Duration;Location
+TRA01;Primera visita trauma;Primera visita de traumatología;TRA;Traumatología;15;Edificio Consultas Externas, planta 1
+TRA02;Visita sucesiva trauma;Visita de revisión de traumatología;TRA;Traumatología;15;Edificio Consultas Externas, planta 1
+TRAPRE;Preoperatorio trauma;Revisión de preoperatorio de traumatología;TRA;Traumatología;20;Edificio Consultas Externas, planta 1
+RAD01;Rad. craneal;Radiografía craneal;RAD;Radiología;10;Edificio Consultas Externas, planta 2
+RAD02;Rad. cuello;Radiografía cuello;RAD;Radiología;10;Edificio Consultas Externas, planta 2
+RAD03;Rad. hombro derecho;Radiografía hombro derecho;RAD;Radiología;10;Edificio Consultas Externas, planta 2
+RAD04;Rad. hombro izquierdo;Radiografía hombro izquierdo;RAD;Radiología;10;Edificio Consultas Externas, planta 2
+RM01;RM rodilla derecha;Resonancia magnética rodilla derecha;RAD;Radiología;25;Edificio Consultas Externas, planta 2
+RM02;RM rodilla izquieda;Resonancia magnética rodilla izquierda;RAD;Radiología;25;Edificio Consultas Externas, planta 2
+ALE01;Prueba alergía polen;Pruebas de alergia al polen;ALE;Alergología;30;Edificio Consultas Externas, planta 3
+ALE02;Prueba intolerancia alimenticia;Prueba de intolerancia alimenticia;ALE;Alergología;30;Edificio Consultas Externas, planta 3

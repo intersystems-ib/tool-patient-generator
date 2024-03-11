@@ -1,4 +1,5 @@
-views/files/generated/*
+views/files/generated/*.csv
+views/files/generated/*.txt
 !views/files/generated/.gitkeep
 
 # Logs

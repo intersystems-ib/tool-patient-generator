@@ -25,7 +25,7 @@ var clinicians = [];
 var allergies = [];
 var facilities = [];
 var diagnosis = [];
-var agendas = [];
+var resources = [];
 var measures = [];
 var analysis = [];
 
@@ -61,14 +61,22 @@ app.get('/download/patients', function(req, res) {
 });
 
 app.get('/download/messages', function(req, res) {
-    if (fs.existsSync(getDir() + '/views/files/generated/messages.txt')) {
-        res.download(getDir() + '/views/files/generated/messages.txt'); 
+    if (fs.existsSync(getDir() + '/views/files/generated/messages'+req.query.type+'.txt')) {
+        res.download(getDir() + '/views/files/generated/messages'+req.query.type+'.txt'); 
+    }
+    else {
+        res.sendFile(getDir() + '/../views/index.html');
+    }
+});
+
+app.get('/download/clinicians', function(req, res) {
+    if (fs.existsSync(getDir() + '/views/files/generated/clinicians.csv')) {
+        res.download(getDir() + '/views/files/generated/clinicians.csv'); 
     }
     else {
         res.sendFile(getDir() + '/views/index.html');
     }
 });
-
     
 
 // Using a function to set default app path
@@ -177,7 +185,7 @@ wsServer.on("request", (request) =>{
             allergies = [];
             facilities = [];
             diagnosis = [];
-            agendas = [];
+            resources = [];
             measures = [];
             analysis = [];
             fs.createReadStream('./views/files/generated/patients.csv')
@@ -214,12 +222,12 @@ wsServer.on("request", (request) =>{
                                 diagnosis.push(row);
                             })
                             .on('end', () => {
-                                fs.createReadStream('./views/files/seed/agendas.csv')
+                                fs.createReadStream('./views/files/seed/resources.csv')
                                 .pipe(csv({
                                     separator: ';'
                                 }))
                                 .on('data', (row) => {
-                                    agendas.push(row);
+                                    resources.push(row);
                                 })
                                 .on('end', () => {
                                     fs.createReadStream('./views/files/seed/measures.csv')
@@ -316,8 +324,8 @@ function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifie
         const clinician2 = clinicians[Math.floor(Math.random() * clinicians.length)];
         const allergy = allergies[Math.floor(Math.random() * allergies.length)];
         const diag = diagnosis[Math.floor(Math.random() * diagnosis.length)];
-        const agenda = agendas[Math.floor(Math.random() * agendas.length)];
-        const durationMillis = parseInt(agenda.Duration) * 60 * 1000;
+        const resource = resources[Math.floor(Math.random() * resources.length)];
+        const durationMillis = parseInt(resource.Duration) * 60 * 1000;
         const dateInPast = functions.parseDate(new Date(+(new Date()) + Math.floor(Math.random()*1000000000000)), 'dateTime', false);
         const dateStartAppointment = functions.parseDate(new Date(+(new Date()) + 15000000), 'dateTime', false);
         const dateEndAppointment = functions.parseDate(new Date(+(new Date()) + (15000000 + durationMillis)), 'dateTime', false);
@@ -409,10 +417,10 @@ function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifie
                 dateMessage: dateTime,
                 placerAppointmentId: Math.floor(Math.random() * 999999),
                 fillerAppointmentId: Math.floor(Math.random() * 999999),
-                agendaCode: agenda.Code,
-                agendaDescription: agenda.Description,
-                agendaExam: agenda.Exam,
-                agendaDuration: agenda.Duration,
+                resourceCode: resource.Code,
+                resourceDescription: resource.Description,
+                resourceExam: resource.Exam,
+                resourceDuration: resource.Duration,
                 dateStartAppointment: dateStartAppointment,
                 dateEndAppointment: dateEndAppointment,
                 fillerPersonSurname: randomPerson1.Surname1 + ' ' + randomPerson1.Surname2,
