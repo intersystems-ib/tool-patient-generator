@@ -19,6 +19,8 @@ const port = 5000;
 const WebSocketServer = require("websocket").server;
 var format = require("string-template");
 const { generateCIPA } = require('./functions.js');
+
+
 var rows = [];
 var patients = [];
 var clinicians = [];
@@ -28,8 +30,17 @@ var diagnosis = [];
 var resources = [];
 var measures = [];
 var analysis = [];
+var bloodTypes = []
 
 // Setting up our port
+var ipIRIS = "localhost";
+var portIRIS = 52774;
+var namespaceIRIS = "HSPIDATA";
+var userIRIS = "superuser";
+var passwordIRIS = "SYS";
+
+// const connection = irisNative.createConnection({host: ipIRIS, port: portIRIS, ns: namespaceIRIS, user: userIRIS, pwd: passwordIRIS});
+// const irisNative = connection.createIris();
 
 server.listen(port, () => console.log("Server at 5000"));
 
@@ -188,6 +199,7 @@ wsServer.on("request", (request) =>{
             resources = [];
             measures = [];
             analysis = [];
+            bloodTypes = []
             fs.createReadStream('./views/files/generated/patients.csv')
             .pipe(csv())
             .on('data', (row) => {
@@ -242,24 +254,31 @@ wsServer.on("request", (request) =>{
                                             analysis.push(row);
                                         })
                                         .on('end', () => {
-                                            if (dataRequest.event === 'a28' && fs.existsSync('./views/files/generated/messagesa28.txt'))
-                                            {
-                                                fs.rmSync('./views/files/generated/messagesa28.txt');                                                                        
-                                            }
-                                            else if (dataRequest.event === 's12' && fs.existsSync('./views/files/generated/messagess12.txt'))
-                                            {
-                                                fs.rmSync('./views/files/generated/messagess12.txt');                                                                        
-                                            }
-                                            else if (dataRequest.event === 'r01' && fs.existsSync('./views/files/generated/messagesr01.txt'))
-                                            {
-                                                fs.rmSync('./views/files/generated/messagesr01.txt');                                                                        
-                                            } 
-                                            else if (dataRequest.event === 'a08' && fs.existsSync('./views/files/generated/messagesa08.txt'))
-                                            {
-                                                fs.rmSync('./views/files/generated/messagesa08.txt');                                                                        
-                                            }                                           
-                                            generateMessage(dataRequest.total, dataRequest.event, dataRequest.patIdAssigningFacility, dataRequest.patIdTypeIdentifier, dataRequest.assigningAuthority, dataRequest.patNHC, connection);    
-                                            connection.send(checkFiles()); 
+                                            fs.createReadStream('./views/files/seed/bloodTypes.csv')
+                                            .pipe(csv())
+                                            .on('data', (row) => {
+                                                bloodTypes.push(row);
+                                            })
+                                            .on('end', () => {
+                                                if (dataRequest.event === 'a28' && fs.existsSync('./views/files/generated/messagesa28.txt'))
+                                                {
+                                                    fs.rmSync('./views/files/generated/messagesa28.txt');                                                                        
+                                                }
+                                                else if (dataRequest.event === 's12' && fs.existsSync('./views/files/generated/messagess12.txt'))
+                                                {
+                                                    fs.rmSync('./views/files/generated/messagess12.txt');                                                                        
+                                                }
+                                                else if (dataRequest.event === 'r01' && fs.existsSync('./views/files/generated/messagesr01.txt'))
+                                                {
+                                                    fs.rmSync('./views/files/generated/messagesr01.txt');                                                                        
+                                                } 
+                                                else if (dataRequest.event === 'a08' && fs.existsSync('./views/files/generated/messagesa08.txt'))
+                                                {
+                                                    fs.rmSync('./views/files/generated/messagesa08.txt');                                                                        
+                                                }                                           
+                                                generateMessage(dataRequest.total, dataRequest.event, dataRequest.patIdAssigningFacility, dataRequest.patIdTypeIdentifier, dataRequest.assigningAuthority, dataRequest.patNHC, connection);    
+                                                connection.send(checkFiles()); 
+                                            });
                                         });  
                                     }); 
                                 });
@@ -332,6 +351,7 @@ function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifie
         const allergySegment = Math.random() < 0.5 ? 0 : 1;
         const diagnosisSegment = Math.random() < 0.5 ? 0 : 1;
         const addSub = Math.random() < 0.5 ? 0 : 1;
+        const bloodType = bloodTypes[Math.floor(Math.random() * bloodTypes.length)];
         
         var NHC = patient.NHC1
         if (patNHC === '2') {
@@ -403,7 +423,8 @@ function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifie
                 diagnosisLiteral: diagnosisSegment? diag.literal : '',
                 diagnosisDate: diagnosisSegment? dateTime.substring(0,8) : '',
                 clinicianSurname: diagnosisSegment? clinician1.Surname1 + ' ' + clinician1.Surname2 : '',
-                clinicianName: diagnosisSegment? clinician1.Name : ''
+                clinicianName: diagnosisSegment? clinician1.Name : '',
+                bloodType: bloodType.Type
             });
         }
         else if (event === 's12')
@@ -561,7 +582,7 @@ function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifie
                 message += '\r\n\r\n'
             }   
         }   
-        connection.send(sendMessage(message));
+        connection.send(sendMessage(message));        
         message += '\r\n\r\n';
         fs.appendFileSync('./views/files/generated/messages'+event+'.txt', message);
     }
