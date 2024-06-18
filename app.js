@@ -27,6 +27,7 @@ var clinicians = [];
 var allergies = [];
 var facilities = [];
 var diagnosis = [];
+var diagnosisUncodified = [];
 var resources = [];
 var measures = [];
 var analysis = [];
@@ -196,6 +197,7 @@ wsServer.on("request", (request) =>{
             allergies = [];
             facilities = [];
             diagnosis = [];
+            diagnosisUncodified = [];
             resources = [];
             measures = [];
             analysis = [];
@@ -260,24 +262,35 @@ wsServer.on("request", (request) =>{
                                                 bloodTypes.push(row);
                                             })
                                             .on('end', () => {
-                                                if (dataRequest.event === 'a28' && fs.existsSync('./views/files/generated/messagesa28.txt'))
-                                                {
-                                                    fs.rmSync('./views/files/generated/messagesa28.txt');                                                                        
-                                                }
-                                                else if (dataRequest.event === 's12' && fs.existsSync('./views/files/generated/messagess12.txt'))
-                                                {
-                                                    fs.rmSync('./views/files/generated/messagess12.txt');                                                                        
-                                                }
-                                                else if (dataRequest.event === 'r01' && fs.existsSync('./views/files/generated/messagesr01.txt'))
-                                                {
-                                                    fs.rmSync('./views/files/generated/messagesr01.txt');                                                                        
-                                                } 
-                                                else if (dataRequest.event === 'a08' && fs.existsSync('./views/files/generated/messagesa08.txt'))
-                                                {
-                                                    fs.rmSync('./views/files/generated/messagesa08.txt');                                                                        
-                                                }                                           
-                                                generateMessage(dataRequest.total, dataRequest.event, dataRequest.patIdAssigningFacility, dataRequest.patIdTypeIdentifier, dataRequest.assigningAuthority, dataRequest.patNHC, connection);    
-                                                connection.send(checkFiles()); 
+                                                fs.createReadStream('./views/files/seed/diagnosisUncodified.csv')
+                                                .pipe(csv())
+                                                .on('data', (row) => {
+                                                    diagnosisUncodified.push(row);
+                                                })
+                                                .on('end', () => {
+                                                    if (dataRequest.event === 'a28' && fs.existsSync('./views/files/generated/messagesa28.txt'))
+                                                    {
+                                                        fs.rmSync('./views/files/generated/messagesa28.txt');                                                                        
+                                                    }
+                                                    else if (dataRequest.event === 's12' && fs.existsSync('./views/files/generated/messagess12.txt'))
+                                                    {
+                                                        fs.rmSync('./views/files/generated/messagess12.txt');                                                                        
+                                                    }
+                                                    else if (dataRequest.event === 'r01' && fs.existsSync('./views/files/generated/messagesr01.txt'))
+                                                    {
+                                                        fs.rmSync('./views/files/generated/messagesr01.txt');                                                                        
+                                                    } 
+                                                    else if (dataRequest.event === 'a08' && fs.existsSync('./views/files/generated/messagesa08.txt'))
+                                                    {
+                                                        fs.rmSync('./views/files/generated/messagesa08.txt');                                                                        
+                                                    }    
+                                                    else if (dataRequest.event === 'a01' && fs.existsSync('./views/files/generated/messagesa01.txt'))
+                                                        {
+                                                            fs.rmSync('./views/files/generated/messagesa01.txt');                                                                        
+                                                        }                                       
+                                                    generateMessage(dataRequest.total, dataRequest.event, dataRequest.patIdAssigningFacility, dataRequest.patIdTypeIdentifier, dataRequest.assigningAuthority, dataRequest.patNHC, connection);    
+                                                    connection.send(checkFiles()); 
+                                                });
                                             });
                                         });  
                                     }); 
@@ -343,6 +356,7 @@ function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifie
         const clinician2 = clinicians[Math.floor(Math.random() * clinicians.length)];
         const allergy = allergies[Math.floor(Math.random() * allergies.length)];
         const diag = diagnosis[Math.floor(Math.random() * diagnosis.length)];
+        const diagUncoded = diagnosisUncodified[Math.floor(Math.random() * diagnosisUncodified.length)];
         const resource = resources[Math.floor(Math.random() * resources.length)];
         const durationMillis = parseInt(resource.Duration) * 60 * 1000;
         const dateInPast = functions.parseDate(new Date(+(new Date()) + Math.floor(Math.random()*1000000000000)), 'dateTime', false);
@@ -581,6 +595,39 @@ function generateMessage(total, event, patIdAssigningFacility,patIdTypeIdentifie
                 }
                 message += '\r\n\r\n'
             }   
+        }
+        else if (event === 'a01')
+        {
+            message = '';
+            // PARA CREAR UNA SERIE DE LECTURAS HACEMOS UN BUCLE PARA REPRESENTAR 10 TOMAS EN 10 DÍAS
+            template = fs.readFileSync('./views/files/templates/A01/A01.template' , {encoding:'utf8', flag:'r'});                      
+            message += format(template, {
+                sendingApp: sendingApp,
+                sendingFacility: sendingFacility, //'HULP'
+                receivingApplication: receivingApp,
+                receivingFacility: center2.code,
+                dateMessage: dateMeasure,
+                messageId: Math.floor(Math.random() * 999999),
+                patientId: patientID,
+                patientIdIdentifier: typeIdentifier, //'NI'
+                assigningAuthority: patIdFacility, // 'MI'
+                patientNHC: NHC,
+                surname1: patient.Surname1,
+                surname2: patient.Surname2,
+                name: patient.Name,
+                birthDate: patient.DOB.substring(0, 8),
+                sex: patient.Gender,
+                streetAddress: patient.TypeStreet +' '+ patient.Street,
+                restAddress: patient.Number +' '+ patient.Floor +' '+ patient.Door,
+                postalCode: patient.PostalCode,
+                cityAddress: patient.City,
+                region: patient.Region,
+                country: patient.Country,
+                cellPhone: patient.CellPhone,
+                personalEmail: patient.Email,
+                diagnosis: diagUncoded.diagnostico,
+            });                
+            message += '\r\n'
         }   
         connection.send(sendMessage(message));        
         message += '\r\n\r\n';
